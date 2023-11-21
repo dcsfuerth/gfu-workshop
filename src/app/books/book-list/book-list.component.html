@@ -1,0 +1,44 @@
+<p>Bücherliste</p>
+
+<div>
+    {{books | json}}
+</div>
+
+<ng-template #noBooks>
+    leider keine Bücher vorhanden
+</ng-template>
+
+<button (click)="toggleCover()">Cover {{coverIsVisible ? 'aus' : 'ein'}}blenden</button>
+
+<p>
+    <input type="text" [(ngModel)]="suchbegriff">
+</p>
+<p>
+    Filterwert: {{suchbegriff}}
+</p>
+
+<table border="1">
+    <tr>
+        <td>ISBN</td>
+        <td>Titel</td>
+        <td>Rating</td>
+        <td>Preis</td>
+        <td>Cover </td>
+    </tr>
+    @for ( book of books; track book.isbn) {
+    <tr>
+        <td>{{$index+1}}: {{book.isbn}}</td>
+        <td>{{book.title}}</td>
+        <td>{{book.rating}}</td>
+        <td [ngClass]="{'on-discount': book.price < 11, 
+                        'teuer' : book.price > 20}">
+            {{book.price | currency:'EUR': 'symbol': '1.2-2'}}</td>
+        <td><img *ngIf="coverIsVisible" [style.width.px]="20" [src]="book.coverUrl"> </td>
+    </tr>
+    }
+    @empty {
+    <tr>
+        <td>keine Bücher</td>
+    </tr>
+    }
+</table>
