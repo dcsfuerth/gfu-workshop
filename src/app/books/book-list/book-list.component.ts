@@ -1,44 +1,110 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Book } from '../book';
+import { CalculatorComponent } from '../../shared/calculator/calculator.component';
+import { BookFilterPipe } from '../book-filter.pipe';
+import {
+  RatingComponent,
+  UserVoting,
+} from '../../shared/rating/rating.component';
+import { BookDataService } from '../book-data.service';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'books-book-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
   templateUrl: './book-list.component.html',
   styleUrl: './book-list.component.css',
+  imports: [
+    CommonModule,
+    FormsModule,
+    CalculatorComponent,
+    BookFilterPipe,
+    RatingComponent,
+    HttpClientModule,
+  ],
 })
 export class BookListComponent {
   coverIsVisible = true;
 
-  public books = [
-    {
-      isbn: '12345',
-      title: 'Angular 16',
-      price: 10,
-      rating: 4.5,
-      coverUrl:
-        'https://m.media-amazon.com/images/I/71Wv+d6oP6L._AC_UY218_.jpg',
-    },
-    {
-      isbn: '12346',
-      title: 'Angular 17',
-      price: 21,
-      rating: 4.7,
-      coverUrl:
-        'https://m.media-amazon.com/images/I/6180XKTXLVL._AC_UY218_.jpg',
-    },
-  ];
+  books: Book[] = [];
 
   suchbegriff: string = '';
+
+  subscription: any = null;
+
+  // private bookDataService: BookDataService;
+
+  // constructor(@Inject(BookDataService) bookDataService: BookDataService) {
+  //   this.bookDataService = bookDataService;
+  // }
+
+  constructor(private bookDataService: BookDataService) {}
+
+  async ngOnInit() {
+    // this.books = this.bookDataService.getBooks();
+
+    this.subscription = this.bookDataService
+      .getBooksNeu()
+      .subscribe((books) => {
+        this.books = books;
+      });
+
+    //
+
+    this.books = await this.bookDataService.getBooksNeu2();
+
+    /// ...
+
+    this.bookDataService.getBooksNeu2().then((books) => {
+      this.books = books;
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
 
   trackByFn(index: number, book: any) {
     return book.isbn;
   }
 
   toggleCover() {
+    //    this.bookDataService.
+
     console.log('toggleCover');
     this.coverIsVisible = !this.coverIsVisible;
+  }
+
+  userClickedPlus($event: string) {
+    console.log('userClickedPlus', $event);
+
+    const buch = this.books.find((book) => book.isbn === $event);
+    if (buch) {
+      buch.rating = this.runde(Math.min(5, buch.rating + 0.1));
+    }
+  }
+
+  userClickedMinus($event: string) {
+    const buch = this.books.find((book) => book.isbn === $event);
+    if (buch) {
+      buch.rating = this.runde(Math.max(1, buch.rating - 0.1));
+    }
+  }
+
+  private runde(x: number) {
+    return +x.toFixed(1);
+  }
+
+  userVoted(vote: UserVoting) {
+    if (vote.isPlus) {
+      this.userClickedPlus(vote.id);
+    } else {
+      this.userClickedMinus(vote.id);
+    }
   }
 }

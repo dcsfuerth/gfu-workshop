@@ -25,11 +25,13 @@
         <td>Preis</td>
         <td>Cover </td>
     </tr>
-    @for ( book of books; track book.isbn) {
+    @for ( book of (books | bookFilter:suchbegriff); track book.isbn) {
     <tr>
         <td>{{$index+1}}: {{book.isbn}}</td>
         <td>{{book.title}}</td>
-        <td>{{book.rating}}</td>
+        <td>
+            <rating [id]="book.isbn" [stars]="book.rating" (vote)="userVoted($event)"></rating>
+        </td>
         <td [ngClass]="{'on-discount': book.price < 11, 
                         'teuer' : book.price > 20}">
             {{book.price | currency:'EUR': 'symbol': '1.2-2'}}</td>
@@ -42,3 +44,5 @@
     </tr>
     }
 </table>
+
+<!-- <books-calculator x='{{book.price}}' y='12'></books-calculator> -->

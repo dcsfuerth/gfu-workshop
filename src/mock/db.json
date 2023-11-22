@@ -1,0 +1,18 @@
+{
+    "books": [
+        {
+            "isbn": "12345",
+            "title": "Angular 16!",
+            "price": 10,
+            "rating": 4.5,
+            "coverUrl": "https://m.media-amazon.com/images/I/71Wv+d6oP6L._AC_UY218_.jpg"
+        },
+        {
+            "isbn": "12346",
+            "title": "Angular 17!",
+            "price": 21,
+            "rating": 4.7,
+            "coverUrl": "https://m.media-amazon.com/images/I/6180XKTXLVL._AC_UY218_.jpg"
+        }
+    ]
+}
